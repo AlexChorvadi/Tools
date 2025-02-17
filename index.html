@@ -85,7 +85,7 @@
                 if (match) {
                     let [, paramName, sqlType] = match;
                     let csharpType = typeMap[sqlType.toLowerCase()] || 'object';
-                    return `${csharpType} ${paramName};`;
+                    return `${csharpType} ${paramName}`;
                 }
                 return '';
             }).filter(Boolean).join(', ');
