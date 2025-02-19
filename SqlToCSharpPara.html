@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL to C# Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        pre {
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+            margin: 10px auto;
+            text-align: left;
+            font-size: 16px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .radio-group {
+            margin: 10px 0;
+        }
+    </style>
+    <script>
+        function convert() {
+            const sqlToCSharp = document.getElementById("sqlToCSharp").checked;
+            const inputText = document.getElementById("inputText").value;
+            
+            if (sqlToCSharp) {
+                convertSqlToCSharp(inputText);
+            } else {
+                convertCSharpToSql(inputText);
+            }
+        }
+
+        function convertSqlToCSharp(sqlParams) {
+            const typeMap = {
+                'int': 'int',
+                'varchar': 'string',
+                'nvarchar': 'string',
+                'char': 'string',
+                'text': 'string',
+                'bigint': 'long',
+                'bit': 'bool',
+                'decimal': 'decimal',
+                'numeric': 'decimal',
+                'float': 'float',
+                'real': 'double',
+                'datetime': 'DateTime',
+                'smalldatetime': 'DateTime'
+            };
+            
+            const result = sqlParams.split(/[,\n]/).map(line => {
+                let match = line.trim().match(/@?(\w+)\s+(\w+)(?:\(\d+\))?/);
+                if (match) {
+                    let [, paramName, sqlType] = match;
+                    let csharpType = typeMap[sqlType.toLowerCase()] || 'object';
+                    return `${csharpType} ${paramName}`;
+                }
+                return '';
+            }).filter(Boolean).join(', ');
+            
+            document.getElementById("output").innerText = result;
+        }
+
+        function convertCSharpToSql(csharpParams) {
+            const typeMap = {
+                'int': 'int',
+                'string': 'varchar(50)',
+                'long': 'bigint',
+                'bool': 'bit',
+                'decimal': 'decimal(18,2)',
+                'float': 'float',
+                'double': 'real',
+                'DateTime': 'datetime'
+            };
+            
+            const result = csharpParams.split(/[,\n]/).map(line => {
+                let match = line.trim().match(/(\w+)\s+(\w+);?/);
+                if (match) {
+                    let [, csharpType, paramName] = match;
+                    let sqlType = typeMap[csharpType] || 'sql_variant';
+                    return `@${paramName} ${sqlType},`;
+                }
+                return '';
+            }).filter(Boolean).join('\n');
+            
+            document.getElementById("output").innerText = result;
+        }
+    </script>
+</head>
+<body>
+    <h2>SQL & C# Parameter Converter</h2>
+    <div class="radio-group">
+        <input type="radio" id="sqlToCSharp" name="conversionType" value="sqlToCSharp" checked>
+        <label for="sqlToCSharp">SQL to C#</label>
+        <input type="radio" id="csharpToSql" name="conversionType" value="csharpToSql">
+        <label for="csharpToSql">C# to SQL</label>
+    </div>
+    <textarea id="inputText" placeholder="Enter parameters here..."></textarea><br>
+    <button onclick="convert()">Convert</button>
+    <h3>Output:</h3>
+    <pre id="output"></pre>
+</body>
+</html>
