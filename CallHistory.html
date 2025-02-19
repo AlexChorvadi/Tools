@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL SP Call Logger Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        textarea {
+            width: 80%;
+            height: 150px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+            margin: 10px auto;
+            text-align: left;
+            font-size: 16px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+    <script>
+        function generateQuery() {
+            const spInput = document.getElementById('spInput').value.trim();
+            const paramValues = document.getElementById('paramValues').value.trim();
+            const output = document.getElementById('output');
+            
+            // Extract the procedure name and parameters
+            const spNameMatch = spInput.match(/(?:ALTER\s+proc\s+)?\[?dbo\]?\.\[?(\w+)\]?|^(\w+)/i);
+            const spName = spNameMatch ? (spNameMatch[1] || spNameMatch[2]) : 'UNKNOWN_SP';
+            
+            const params = spInput.match(/@(\w+)\s+(\w+(?:\(\d+\))?)/g) || [];
+            
+            let paramValuesArray = paramValues.split(/,|\[|\]/).map(v => v.trim()).filter(Boolean);
+            
+            let declareQuery = 'DECLARE\n';
+            let insertParams = [];
+            let valuesProvided = paramValuesArray.length > 0;
+            
+            params.forEach((param, index) => {
+                let [paramName, paramType] = param.split(' ');
+                let paramValue = valuesProvided && paramValuesArray[index] !== undefined ? paramValuesArray[index] : 'NULL';
+                if (paramType.includes('varchar') || paramType.includes('char')) {
+                    paramValue = `'${paramValue}'`;
+                }
+                declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
+                insertParams.push(`'['+ISNULL(CAST(${paramName} AS VARCHAR(MAX)),'')+']'`);
+            });
+            
+            declareQuery = declareQuery.replace(/,$/, '');
+            let insertQuery = `INSERT INTO Log_SPCallHistory(SP_Name, SP_Para, CreateDate)\nVALUES ('${spName.toUpperCase()}',\n    ` + insertParams.join(',\n    ') + ",\n    CONVERT(VARCHAR(23), GETDATE(), 121));";
+            
+            let selectQuery = `\n\nSELECT TOP 10 * FROM Log_SPCallHistory WITH (NOLOCK) WHERE SP_Name = '${spName.toUpperCase()}' ORDER BY id DESC;`;
+            
+            output.value = valuesProvided ? declareQuery : insertQuery + selectQuery;
+        }
+        
+        function copyToClipboard() {
+            const output = document.getElementById('output');
+            navigator.clipboard.writeText(output.value).then(() => {
+                alert('Queries copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>SQL SP Call Logger Generator</h2>
+    <textarea id="spInput" placeholder="Paste stored procedure definition here..."></textarea><br>
+    <textarea id="paramValues" placeholder="Enter values (optional), e.g., 1,2,3,'test'"></textarea><br>
+    <button onclick="generateQuery()">Generate SQL</button>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    <h3>Generated SQL Query:</h3>
+    <textarea id="output"></textarea>
+</body>
+</html>
