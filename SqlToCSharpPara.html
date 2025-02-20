@@ -35,37 +35,40 @@
         }
     </style>
     <script>
-        function convertToCSharp() {
-            const inputText = document.getElementById("sqlInput").value;
-            const outputArea = document.getElementById("csharpOutput");
+        function convertSqlToCSharp() {
+            const inputText = document.getElementById("inputText").value;
             
-            let spMatch = inputText.match(/(?:CREATE\s+PROCEDURE\s+\[dbo\]\.|\[dbo\]\.|)(\[.*?\]|\w+)/i);
+            // Extract stored procedure name
+            let spMatch = inputText.match(/(?:CREATE\s+PROCEDURE\s+\[dbo\]\.|ALTER\s+PROCEDURE\s+\[dbo\]\.|\[dbo\]\.|)(\[.*?\]|\w+)/i);
             let spName = spMatch ? spMatch[1].replace(/\[|\]/g, '') : "Unknown_SP";
             
+            // Extract parameters
             let paramMatches = inputText.matchAll(/@(\w+)\s+(\w+)(?:\(\d+\))?/g);
-            let paramList = [];
-            let paramDeclarations = [];
-
+            let paramsArray = [];
+            let paramsList = [];
+            
             for (let match of paramMatches) {
                 let paramName = match[1];
                 let paramType = match[2].toLowerCase().includes("varchar") ? "string" : "int";
-                paramList.push(`${paramType} ${paramName}`);
-                paramDeclarations.push(`cmd.Parameters.AddWithValue('@${paramName}', ${paramName});`);
+                paramsArray.push(`${paramType} ${paramName}`);
+                paramsList.push(`cmd.Parameters.AddWithValue('@${paramName}', ${paramName});`);
             }
-
-            let methodDefinition = `public static DataTable ${spName}(${paramList.join(", ")}) {
+            
+            let methodSignature = `public static DataTable ${spName}(${paramsArray.join(", ")})`;
+            let methodBody = `{
     SqlCommand cmd = new SqlCommand();
     cmd.CommandText = "${spName}";
-    ${paramDeclarations.join("\n    ")}
+    ${paramsList.join("\n    ")}
     DataTable dt = CreateCommand.ExecuteQuery(cmd);
     return dt;
 }`;
             
-            outputArea.value = methodDefinition;
+            let finalOutput = methodSignature + "\n" + methodBody;
+            document.getElementById("output").value = finalOutput;
         }
-
+        
         function copyToClipboard() {
-            const outputText = document.getElementById("csharpOutput");
+            const outputText = document.getElementById("output");
             outputText.select();
             document.execCommand("copy");
             alert("Copied to clipboard!");
@@ -74,10 +77,10 @@
 </head>
 <body>
     <h2>SQL to C# SqlCommand Converter</h2>
-    <textarea id="sqlInput" placeholder="Paste SQL procedure here..."></textarea><br>
-    <button onclick="convertToCSharp()">Convert</button>
+    <textarea id="inputText" placeholder="Paste SQL procedure definition here..."></textarea><br>
+    <button onclick="convertSqlToCSharp()">Convert</button>
     <button onclick="copyToClipboard()">Copy to Clipboard</button>
     <h3>Generated C# Code:</h3>
-    <textarea id="csharpOutput" readonly></textarea>
+    <textarea id="output" readonly></textarea>
 </body>
 </html>
