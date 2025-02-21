@@ -51,7 +51,7 @@
                 let paramName = match[1];
                 let paramType = match[2].toLowerCase().includes("varchar") ? "string" : "int";
                 paramsArray.push(`${paramType} ${paramName}`);
-                paramsList.push(`cmd.Parameters.AddWithValue('@${paramName}', ${paramName});`);
+                paramsList.push(`cmd.Parameters.AddWithValue("@${paramName}", ${paramName});`);
             }
             
             let methodSignature = `public static DataTable ${spName}(${paramsArray.join(", ")})`;
