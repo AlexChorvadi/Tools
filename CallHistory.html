@@ -58,7 +58,8 @@
             
             const params = spInput.match(/@(\w+)\s+(\w+(?:\(\d+\))?)/g) || [];
             
-            let paramValuesArray = paramValues.split(/,|\[|\]/).map(v => v.trim()).filter(Boolean);
+            let paramValuesArray = paramValues.match(/"[^"]*"|[^,]+/g).map(item => item.replace(/"/g, ''));
+            //paramValues.split(/,|\[|\]/).map(v => v.trim()).filter(Boolean);
             
             let declareQuery = 'DECLARE\n';
             let insertParams = [];
