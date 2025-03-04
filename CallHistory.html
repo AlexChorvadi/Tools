@@ -68,14 +68,14 @@
                 let [paramName, paramType] = param.split(' ');
                 let paramValue = valuesProvided && paramValuesArray[index] !== undefined ? paramValuesArray[index] : 'NULL';
                 if (paramType.includes('varchar') || paramType.includes('char')) {
-                    paramValue = `'${paramValue}'`;
+                    paramValue = `${paramValue.toString()}`;
                 }
                 declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
                 insertParams.push(`'['+ISNULL(CAST(${paramName} AS VARCHAR(MAX)),'')+']'`);
             });
             
             declareQuery = declareQuery.replace(/,$/, '');
-            let insertQuery = `INSERT INTO Log_SPCallHistory(SP_Name, SP_Para, CreateDate)\nVALUES ('${spName.toUpperCase()}',\n    ` + insertParams.join(',\n    ') + ",\n    CONVERT(VARCHAR(23), GETDATE(), 121));";
+            let insertQuery = `INSERT INTO Log_SPCallHistory(SP_Name, SP_Para, CreateDate)\nVALUES ('${spName.toUpperCase()}',\n    ` + insertParams.join(`+','+\n    `) + ",\n    CONVERT(VARCHAR(23), GETDATE(), 121));";
             
             let selectQuery = `\n\nSELECT TOP 10 * FROM Log_SPCallHistory WITH (NOLOCK) WHERE SP_Name = '${spName.toUpperCase()}' ORDER BY id DESC;`;
             
