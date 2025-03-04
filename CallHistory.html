@@ -69,7 +69,7 @@
                 let [paramName, paramType] = param.split(' ');
                 let paramValue = valuesProvided && paramValuesArray[index] !== undefined ? paramValuesArray[index] : 'NULL';
                 if (paramType.includes('varchar') || paramType.includes('char')) {
-                    paramValue = `${paramValue.toString()}`;
+                    paramValue = `'${paramValue.toString()}'`;
                 }
                 declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
                 insertParams.push(`'['+ISNULL(CAST(${paramName} AS VARCHAR(MAX)),'')+']'`);
