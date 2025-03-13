@@ -57,8 +57,9 @@
             const spName = spNameMatch ? (spNameMatch[1] || spNameMatch[2]) : 'UNKNOWN_SP';
             
             const params = spInput.match(/@(\w+)\s+(\w+(?:\(\d+\))?)/g) || [];
-            
-            let paramValuesArray = paramValues != "" ? paramValues.match(/"[^"]*"|[^,]+/g).map(item => item.replace(/"/g, '')) : "";
+
+            let paramValuesArray = paramValues != "" ? paramValues.match(/\[.*?\]|[^,\[\]]+/g).map(item => item.replace(/[\[\]]/g, '')) : "";
+            //let paramValuesArray = paramValues != "" ? paramValues.match(/"[^"]*"|[^,]+/g).map(item => item.replace(/"/g, '')) : "";
             //paramValues.split(/,|\[|\]/).map(v => v.trim()).filter(Boolean);
             
             let declareQuery = 'DECLARE\n';
