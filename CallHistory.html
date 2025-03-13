@@ -12,13 +12,13 @@
             text-align: center;
         }
         textarea {
-            width: 80%;
-            height: 150px;
+            width: 90%;
             margin: 10px 0;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
+            resize: vertical;
         }
         button {
             background-color: #007bff;
@@ -63,6 +63,7 @@
             //paramValues.split(/,|\[|\]/).map(v => v.trim()).filter(Boolean);
             
             let declareQuery = 'DECLARE\n';
+            let declareParams = [];
             let insertParams = [];
             let valuesProvided = paramValuesArray.length > 0;
             
@@ -72,14 +73,15 @@
                 if (paramType.includes('varchar') || paramType.includes('char')) {
                     paramValue = `'${paramValue.toString()}'`;
                 }
-                declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
+                //declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
+                declareParams.push(`    ${paramName} ${paramType} = ${paramValue}`);
                 insertParams.push(`'['+ISNULL(CAST(${paramName} AS VARCHAR(MAX)),'')+']'`);
             });
             
-            declareQuery = declareQuery.replace(/,$/, '');
+            declareQuery = declareQuery + declareParams.join(`,\n`).replace(/,$/, '');
             let insertQuery = `INSERT INTO Log_SPCallHistory(SP_Name, SP_Para, CreateDate)\nVALUES ('${spName.toUpperCase()}',\n    ` + insertParams.join(`+','+\n    `) + ",\n    CONVERT(VARCHAR(23), GETDATE(), 121));";
             
-            let selectQuery = `\n\nSELECT TOP 10 * FROM Log_SPCallHistory WITH (NOLOCK) WHERE SP_Name = '${spName.toUpperCase()}' ORDER BY id DESC;`;
+            let selectQuery = `\n\n--SELECT TOP 10 * FROM Log_SPCallHistory WITH (NOLOCK) WHERE SP_Name = '${spName.toUpperCase()}' ORDER BY id DESC;`;
             
             output.value = valuesProvided ? declareQuery : insertQuery + selectQuery;
         }
@@ -96,11 +98,19 @@
 </head>
 <body>
     <h2>SQL SP Call Logger Generator</h2>
-    <textarea id="spInput" placeholder="Paste stored procedure definition here..."></textarea><br>
-    <textarea id="paramValues" placeholder="Enter values (optional), e.g., 1,2,3,'test'"></textarea><br>
-    <button onclick="generateQuery()">Generate SQL</button>
-    <button onclick="copyToClipboard()">Copy to Clipboard</button>
-    <h3>Generated SQL Query:</h3>
-    <textarea id="output"></textarea>
+    <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div style="flex:1;">
+            <textarea id="spInput" placeholder="Paste stored procedure definition here..." style="height: 500px;"></textarea><br>
+            <textarea id="paramValues" placeholder="Enter values (optional), e.g., 1,2,3,'test'" style="height: 30px;"></textarea><br>
+        </div>
+        <div style="flex:1;">
+            <!-- <h3>Generated SQL Query:</h3> -->
+            <textarea id="output" placeholder="Output..." style="height: calc(500px + 30px);"></textarea>
+        </div>
+    </div>
+    <div>
+        <button onclick="generateQuery()">Generate SQL</button>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
 </body>
 </html>
