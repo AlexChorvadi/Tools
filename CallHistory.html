@@ -45,6 +45,13 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+        #visitor-count{
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            font-family: cursive, sans-serif;
+        }
     </style>
     <script>
         function generateQuery() {
@@ -94,6 +101,22 @@
                 console.error('Failed to copy text: ', err);
             });
         }
+        
+      // Function to fetch and update visitor count
+      function updateVisitorCount() {
+        fetch('https://api.countapi.xyz/hit/alexchorvadi/CallHistoryVisitors')
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById('visitor-count').innerText = `Visitors: ${data.value}`;
+          })
+          .catch(error => {
+            console.log('Error fetching count:', error);
+            document.getElementById('visitor-count').innerText = 'Visitors: Unable to load';
+          });
+      }
+    
+      // Call the function when the page loads
+      window.onload = updateVisitorCount;
     </script>
 </head>
 <body>
@@ -112,5 +135,6 @@
         <button onclick="generateQuery()">Generate SQL</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
     </div>
+    <div id="visitor-count">Visitors: Loading...</div>
 </body>
 </html>
