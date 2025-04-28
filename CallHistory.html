@@ -101,22 +101,6 @@
                 console.error('Failed to copy text: ', err);
             });
         }
-        
-      // Function to fetch and update visitor count
-      function updateVisitorCount() {
-        fetch('https://api.countapi.xyz/hit/alexchorvadi/CallHistoryVisitors')
-          .then(response => response.json())
-          .then(data => {
-            document.getElementById('visitor-count').innerText = `Visitors: ${data.value}`;
-          })
-          .catch(error => {
-            console.log('Error fetching count:', error);
-            document.getElementById('visitor-count').innerText = 'Visitors: Unable to load';
-          });
-      }
-    
-      // Call the function when the page loads
-      window.onload = updateVisitorCount;
     </script>
 </head>
 <body>
@@ -135,6 +119,11 @@
         <button onclick="generateQuery()">Generate SQL</button>
         <button onclick="copyToClipboard()">Copy to Clipboard</button>
     </div>
-    <div id="visitor-count">Visitors: Loading...</div>
+    <footer style="position: absolute; bottom: 0; right: 0;">
+        <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-content: center; align-items: center;">
+            <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1333104/t/3"></script>
+        </div>
+    </footer>
+    
 </body>
 </html>
