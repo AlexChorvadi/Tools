@@ -63,7 +63,8 @@
             const spNameMatch = spInput.match(/(?:ALTER\s+proc\s+)?\[?dbo\]?\.\[?(\w+)\]?|^(\w+)/i);
             const spName = spNameMatch ? (spNameMatch[1] || spNameMatch[2]) : 'UNKNOWN_SP';
             
-            const params = spInput.match(/@(\w+)\s+(\w+(?:\(\d+\))?)/g) || [];
+            //const params = spInput.match(/@(\w+)\s+(\w+(?:\(\d+\))?)/g) || [];
+            const params = spInput.match(/@(\w+)\s+(\w+(?:\((?:\d+|MAX)\))?)/gi) || [];
 
             let paramValuesArray = paramValues != "" ? paramValues.match(/\[.*?\]|[^,\[\]]+/g).map(item => item.replace(/[\[\]]/g, '')) : "";
             //let paramValuesArray = paramValues != "" ? paramValues.match(/"[^"]*"|[^,]+/g).map(item => item.replace(/"/g, '')) : "";
@@ -77,9 +78,9 @@
             params.forEach((param, index) => {
                 let [paramName, paramType] = param.split(' ');
                 let paramValue = valuesProvided && paramValuesArray[index] !== undefined ? paramValuesArray[index] : 'NULL';
-                if (paramType.includes('varchar') || paramType.includes('char')) {
+                /*if (paramType.includes('varchar') || paramType.includes('char')) {
                     paramValue = `'${paramValue.toString()}'`;
-                }
+                }*/
                 //declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
                 declareParams.push(`    ${paramName} ${paramType} = ${paramValue}`);
                 insertParams.push(`'['+ISNULL(CAST(${paramName} AS VARCHAR(MAX)),'')+']'`);
