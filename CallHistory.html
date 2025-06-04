@@ -78,9 +78,9 @@
             params.forEach((param, index) => {
                 let [paramName, paramType] = param.split(' ');
                 let paramValue = valuesProvided && paramValuesArray[index] !== undefined ? paramValuesArray[index] : 'NULL';
-                /*if (paramType.includes('varchar') || paramType.includes('char')) {
+                if ((paramType.includes('varchar') || paramType.includes('char')) && !paramValue.includes("'")) {
                     paramValue = `'${paramValue.toString()}'`;
-                }*/
+                }
                 //declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
                 declareParams.push(`    ${paramName} ${paramType} = ${paramValue}`);
                 insertParams.push(`'['+ISNULL(CAST(${paramName} AS VARCHAR(MAX)),'')+']'`);
