@@ -60,8 +60,8 @@
             const output = document.getElementById('output');
             
             // Extract the procedure name and parameters
-            const spNameMatch = spInput.match(/(?:ALTER\s+proc\s+)?\[?dbo\]?\.\[?(\w+)\]?|^(\w+)/i);
-            const spName = spNameMatch ? (spNameMatch[1] || spNameMatch[2]) : 'UNKNOWN_SP';
+            const spNameMatch = spInput.match(/(?:ALTER\s+proc\s+)?\[?dbo\]?\.\[?(\w+)\]?|\[?(\w+)\]?|^(\w+)/i);
+            const spName = spNameMatch ? (spNameMatch[1] || spNameMatch[2] || spNameMatch[3]) : 'UNKNOWN_SP';
             
             //const params = spInput.match(/@(\w+)\s+(\w+(?:\(\d+\))?)/g) || [];
             const params = spInput.match(/@(\w+)\s+(\w+(?:\((?:\d+|MAX)\))?)/gi) || [];
@@ -78,7 +78,7 @@
             params.forEach((param, index) => {
                 let [paramName, paramType] = param.split(' ');
                 let paramValue = valuesProvided && paramValuesArray[index] !== undefined ? paramValuesArray[index] : 'NULL';
-                if ((paramType.includes('varchar') || paramType.includes('char')) && !paramValue.includes("'")) {
+                if ((paramType.toLowerCase().includes('varchar') || paramType.toLowerCase().includes('char')) && !paramValue.includes("'")) {
                     paramValue = `'${paramValue.toString()}'`;
                 }
                 //declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
