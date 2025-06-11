@@ -99,7 +99,7 @@
         function copyToClipboard() {
             const output = document.getElementById('output');
             navigator.clipboard.writeText(output.value).then(() => {
-                alert('Queries copied to clipboard!');
+                toast('Queries copied to clipboard!');
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
             });
