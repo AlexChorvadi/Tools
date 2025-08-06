@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQL to C# SqlCommand Converter</title>
+    <link rel="stylesheet" href="https://alexchorvadi.github.io/Tools/src/toast.css" />
+    <script type="text/javascript" src="https://alexchorvadi.github.io/Tools/src/index.js" /></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -72,7 +74,7 @@
             const outputText = document.getElementById("output");
             outputText.select();
             document.execCommand("copy");
-            alert("Copied to clipboard!");
+            toast('Copied to clipboard!');
         }
     </script>
 </head>
@@ -96,5 +98,8 @@
             <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1333104/t/3"></script>
         </div>
     </footer>
+    <div class="toast-container">
+        <div class="toast" id="toast"></div>
+      </div>
 </body>
 </html>
