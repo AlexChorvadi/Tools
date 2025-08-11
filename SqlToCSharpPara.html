@@ -52,7 +52,26 @@
             
             for (let match of paramMatches) {
                 let paramName = match[1];
-                let paramType = match[2].toLowerCase().includes("varchar") ? "string" : "int";
+                let sqlType = match[2].toLowerCase().trim();
+                let paramType;
+                if (sqlType.includes("varchar") || sqlType.includes("char") || sqlType.includes("text") || sqlType.includes("ntext")) {
+                    paramType = "string";
+                } 
+                else if (sqlType.includes("int") && !sqlType.includes("big") && !sqlType.includes("small") && !sqlType.includes("tiny")) {
+                    paramType = "int";
+                }
+                else if (sqlType.includes("decimal") || sqlType.includes("numeric") || sqlType.includes("money") || sqlType.includes("smallmoney")) {
+                    paramType = "decimal";
+                }
+                else if (sqlType.includes("datetime") || sqlType.includes("smalldatetime") || sqlType.includes("date") || sqlType.includes("time")) {
+                    paramType = "DateTime";
+                }
+                else if (sqlType.includes("dbo.") && sqlType.includes("readonly")) {
+                    paramType = "DataTable";
+                }
+                else {
+                    paramType = "object"; // Fallback for unmapped SQL types
+                }
                 paramsArray.push(`${paramType} ${paramName}`);
                 paramsList.push(`cmd.Parameters.AddWithValue("@${paramName}", ${paramName});`);
             }
