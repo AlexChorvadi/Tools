@@ -80,7 +80,7 @@
             params.forEach((param, index) => {
                 let [paramName, paramType] = param.split(' ');
                 let paramValue = valuesProvided && paramValuesArray[index] !== undefined ? paramValuesArray[index] : 'NULL';
-                if ((paramType.toLowerCase().includes('varchar') || paramType.toLowerCase().includes('char')) && !paramValue.includes("'")) {
+                if ((paramType.toLowerCase().includes('varchar') || paramType.toLowerCase().includes('char') || paramType.toLowerCase().includes('datetime')) && !paramValue.includes("'")) {
                     paramValue = `'${paramValue.toString()}'`;
                 }
                 //declareQuery += `    ${paramName} ${paramType} = ${paramValue},\n`;
