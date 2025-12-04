@@ -65,7 +65,7 @@
             const regex = /^(?:ALTER\s+PROC(?:EDURE)?\s+|CREATE\s+PROC(?:EDURE)?\s+)?(?:\[\s*(dbo)\s*\]\s*\.\s*)?\[\s*([A-Za-z0-9_]+)\s*\]|^(?:ALTER\s+PROC(?:EDURE)?\s+|CREATE\s+PROC(?:EDURE)?\s+)?(?:\b(dbo)\b\.)?([A-Za-z0-9_]+)/i;
             //const spNameMatch = spInput.match(/(?:ALTER\s+proc\s+)?\[?dbo\]?\.\[?(\w+)\]?|\[?(\w+)\]?|^(\w+)/i);
             const spNameMatch = spInput.match(regex);
-            const spName = spNameMatch ? (spNameMatch[1] || spNameMatch[2] || spNameMatch[3]) : 'UNKNOWN_SP';
+            const spName = spNameMatch ? (spNameMatch?.[2] || spNameMatch?.[4]) : 'UNKNOWN_SP';
             
             //const params = spInput.match(/@(\w+)\s+(\w+(?:\(\d+\))?)/g) || [];
             const params = spInput.match(/@(\w+)\s+(\w+(?:\((?:\d+|MAX)\))?)/gi) || [];
