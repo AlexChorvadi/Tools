@@ -47,7 +47,7 @@
             let spName = spMatch ? spMatch[1].replace(/\[|\]/g, '') : "Unknown_SP";
             */
             const regex = /^(?:ALTER\s+PROC(?:EDURE)?\s+|CREATE\s+PROC(?:EDURE)?\s+)?(?:\[\s*(dbo)\s*\]\s*\.\s*)?\[\s*([A-Za-z0-9_]+)\s*\]|^(?:ALTER\s+PROC(?:EDURE)?\s+|CREATE\s+PROC(?:EDURE)?\s+)?(?:\b(dbo)\b\.)?([A-Za-z0-9_]+)/i;
-            const spNameMatch = spInput.match(regex);
+            const spNameMatch = inputText.match(regex);
             const spName = spNameMatch ? (spNameMatch?.[2] || spNameMatch?.[4]) : 'UNKNOWN_SP';
             
             // Extract parameters
