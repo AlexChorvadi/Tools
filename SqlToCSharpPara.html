@@ -42,8 +42,13 @@
             const inputText = document.getElementById("inputText").value;
             
             // Extract stored procedure name
+            /*
             let spMatch = inputText.match(/(?:CREATE\s+PROCEDURE\s+\[dbo\]\.|ALTER\s+PROCEDURE\s+\[dbo\]\.|\[dbo\]\.|)(\[.*?\]|\w+)/i);
             let spName = spMatch ? spMatch[1].replace(/\[|\]/g, '') : "Unknown_SP";
+            */
+            const regex = /^(?:ALTER\s+PROC(?:EDURE)?\s+|CREATE\s+PROC(?:EDURE)?\s+)?(?:\[\s*(dbo)\s*\]\s*\.\s*)?\[\s*([A-Za-z0-9_]+)\s*\]|^(?:ALTER\s+PROC(?:EDURE)?\s+|CREATE\s+PROC(?:EDURE)?\s+)?(?:\b(dbo)\b\.)?([A-Za-z0-9_]+)/i;
+            const spNameMatch = spInput.match(regex);
+            const spName = spNameMatch ? (spNameMatch?.[2] || spNameMatch?.[4]) : 'UNKNOWN_SP';
             
             // Extract parameters
             let paramMatches = inputText.matchAll(/@(\w+)\s+(\w+)(?:\(\d+\))?/g);
